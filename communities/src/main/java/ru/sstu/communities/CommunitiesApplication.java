@@ -1,13 +1,13 @@
-package ru.sstu.albums;
+package ru.sstu.communities;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AlbumsApplication {
+public class CommunitiesApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(AlbumsApplication.class, args);
+        SpringApplication.run(CommunitiesApplication.class, args);
     }
 
 }

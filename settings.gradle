@@ -1,2 +1,6 @@
 rootProject.name = 'social-media-microservices'
 
+include("server")
+include("users")
+include("albums")
+include("communities")
