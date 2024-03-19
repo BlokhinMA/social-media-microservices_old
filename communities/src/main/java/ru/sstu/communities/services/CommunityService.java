@@ -1,11 +1,8 @@
 package ru.sstu.communities.services;
 
-import ru.sstu.communities.models.Community;
-import ru.sstu.communities.models.CommunityMember;
-import ru.sstu.communities.models.CommunityPost;
-import ru.sstu.communities.repositories.CommunityPostRepository;
-import ru.sstu.communities.repositories.CommunityRepository;
-import ru.sstu.communities.repositories.CommunityMemberRepository;
+import ru.sstu.communities.repositories.CommunityPost;
+import ru.sstu.communities.repositories.Community;
+import ru.sstu.communities.repositories.CommunityMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,84 +13,84 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommunityService {
 
-    private final CommunityRepository communityRepository;
-    private final CommunityMemberRepository communityMemberRepository;
-    private final CommunityPostRepository communityPostRepository;
+    private final Community community;
+    private final CommunityMember communityMember;
+    private final CommunityPost communityPost;
 
-    public List<Community> showAllOwn(Principal principal) {
-        return communityRepository.findAllByCreatorLogin(principal.getName());
+    public List<ru.sstu.communities.models.Community> showAllOwn(Principal principal) {
+        return community.findAllByCreatorLogin(principal.getName());
     }
 
-    public List<Community> showAll(Principal principal) {
-        return communityRepository.findAllByMemberLogin(principal.getName());
+    public List<ru.sstu.communities.models.Community> showAll(Principal principal) {
+        return community.findAllByMemberLogin(principal.getName());
     }
 
-    public List<Community> showAll(String memberLogin) {
-        return communityRepository.findAllByMemberLogin(memberLogin);
+    public List<ru.sstu.communities.models.Community> showAll(String memberLogin) {
+        return community.findAllByMemberLogin(memberLogin);
     }
 
-    public void create(Community community, Principal principal) {
+    public void create(ru.sstu.communities.models.Community community, Principal principal) {
         community.setCreatorLogin(principal.getName());
-        Community createdCommunity = communityRepository.save(community);
+        ru.sstu.communities.models.Community createdCommunity = this.community.save(community);
     }
 
     public void delete(int id, Principal principal) {
-        List<CommunityMember> members = communityMemberRepository.findAllByCommunityId(id);
-        List<CommunityPost> posts = communityPostRepository.findAllByCommunityId(id);
-        Community deletedCommunity = communityRepository.deleteById(id);
+        List<ru.sstu.communities.models.CommunityMember> members = communityMember.findAllByCommunityId(id);
+        List<ru.sstu.communities.models.CommunityPost> posts = communityPost.findAllByCommunityId(id);
+        ru.sstu.communities.models.Community deletedCommunity = community.deleteById(id);
         deletedCommunity.setMembers(members);
         deletedCommunity.setPosts(posts);
     }
 
-    public Community show(int id) {
-        Community community = communityRepository.findById(id);
-        community.setMembers(communityMemberRepository.findAllByCommunityId(id));
-        community.setPosts(communityPostRepository.findAllByCommunityId(id));
+    public ru.sstu.communities.models.Community show(int id) {
+        ru.sstu.communities.models.Community community = this.community.findById(id);
+        community.setMembers(communityMember.findAllByCommunityId(id));
+        community.setPosts(communityPost.findAllByCommunityId(id));
         return community;
     }
 
     public void join(Principal principal, int communityId) {
-        if (communityRepository.findById(communityId) == null)
+        if (community.findById(communityId) == null)
             return;
-        CommunityMember communityMember = new CommunityMember();
+        ru.sstu.communities.models.CommunityMember communityMember = new ru.sstu.communities.models.CommunityMember();
         communityMember.setMemberLogin(principal.getName());
         communityMember.setCommunityId(communityId);
-        CommunityMember joinedCommunityMember = communityMemberRepository.save(communityMember);
+        ru.sstu.communities.models.CommunityMember joinedCommunityMember = this.communityMember.save(communityMember);
     }
 
     public boolean isMember(Principal principal, int communityId) {
-        return communityMemberRepository.findByMemberLoginAndCommunityId(principal.getName(), communityId) != null;
+        return communityMember.findByMemberLoginAndCommunityId(principal.getName(), communityId) != null;
     }
 
-    public void leave(Principal principal, CommunityMember communityMember) {
-        if (communityRepository.findById(communityMember.getCommunityId()) == null)
+    public void leave(Principal principal, ru.sstu.communities.models.CommunityMember communityMember) {
+        if (community.findById(communityMember.getCommunityId()) == null)
             return;
         communityMember.setMemberLogin(principal.getName());
-        CommunityMember leftCommunityMember = communityMemberRepository.deleteByMemberLoginAndCommunityId(communityMember);
+        ru.sstu.communities.models.CommunityMember leftCommunityMember = this.communityMember.deleteByMemberLoginAndCommunityId(communityMember);
     }
 
-    public void kickCommunityMember(CommunityMember communityMember, Principal principal) {
-        if (communityRepository.findById(communityMember.getCommunityId()) == null)
+    public void kickCommunityMember(ru.sstu.communities.models.CommunityMember communityMember, Principal principal) {
+        if (community.findById(communityMember.getCommunityId()) == null)
             return;
-        CommunityMember kickedCommunityMember = communityMemberRepository.deleteById(communityMember.getId());
+        ru.sstu.communities.models.CommunityMember kickedCommunityMember = this.communityMember.deleteById(communityMember.getId());
     }
 
-    public void createPost(CommunityPost communityPost, Principal principal) {
-        if (communityRepository.findById(communityPost.getCommunityId()) == null)
+    public void createPost(ru.sstu.communities.models.CommunityPost communityPost, Principal principal) {
+        if (community.findById(communityPost.getCommunityId()) == null)
             return;
         communityPost.setAuthorLogin(principal.getName());
-        CommunityPost createdPost = communityPostRepository.save(communityPost);
+        ru.sstu.communities.models.CommunityPost createdPost = this.communityPost.save(communityPost);
     }
 
-    public void deletePost(CommunityPost communityPost, Principal principal) {
-        if (communityRepository.findById(communityPost.getCommunityId()) == null)
+    public void deletePost(ru.sstu.communities.models.CommunityPost communityPost, Principal principal) {
+        if (community.findById(communityPost.getCommunityId()) == null)
             return;
-        CommunityPost deletedCommunityPost = communityPostRepository.deleteById(communityPost.getId());
+        ru.sstu.communities.models.CommunityPost deletedCommunityPost = this.communityPost.deleteById(communityPost.getId());
     }
 
-    public List<Community> find(String keyword) {
+    public List<ru.sstu.communities.models.Community> find(String keyword) {
         if (keyword != null && !keyword.isEmpty())
-            return communityRepository.findAllLikeName(keyword);
+            return community.findAllLikeName(keyword);
         return null;
     }
 
